@@ -6,7 +6,9 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
-from invenio_config_tugraz.generators import RecordIp
+from elasticsearch_dsl.query import Q
+
+from invenio_config_tugraz.generators import AnyUserIfPublic, RecordIp
 
 
 def test_recordip():
@@ -14,4 +16,12 @@ def test_recordip():
 
     assert generator.needs() == []
     assert generator.excludes() == []
-    assert generator.query_filter().to_dict() == {'match_all': {}}
+    assert generator.query_filter() == []
+
+
+def test_AnyUserIfPublic():
+    generator = AnyUserIfPublic()
+
+    assert generator.needs() == []
+    assert generator.excludes() == []
+    assert generator.query_filter() == Q("match", **{"access.access_right": "open"})
