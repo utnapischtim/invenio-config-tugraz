@@ -49,17 +49,14 @@ Using Custom Generator for a policy:
 Permissions for Invenio (RDM) Records.
 """
 
-from invenio_records_permissions.generators import (
-    Admin,
-    AnyUser,
-    AnyUserIfPublic,
-    RecordOwners,
-)
+
+from invenio_records_permissions.generators import Admin, AnyUser, RecordOwners
 from invenio_records_permissions.policies.base import BasePermissionPolicy
 
-from .generators import RecordIp
+from .generators import AnyUserIfPublic, RecordIp
 
 
+# bug this policy is not used!
 class TUGRAZPermissionPolicy(BasePermissionPolicy):
     """Access control configuration for records.
 
@@ -68,7 +65,7 @@ class TUGRAZPermissionPolicy(BasePermissionPolicy):
     """
 
     # Read access to API given to everyone.
-    can_search = [AnyUser(), RecordIp()]
+    can_search = [AnyUser()]
 
     # Read access given to everyone if public record/files and owners always.
     can_read = [AnyUserIfPublic(), RecordOwners(), RecordIp()]
@@ -86,3 +83,9 @@ class TUGRAZPermissionPolicy(BasePermissionPolicy):
     # Associated files permissions (which are really bucket permissions)
     can_read_files = [AnyUserIfPublic(), RecordOwners()]
     can_update_files = [RecordOwners()]
+
+    can_publish = [AnyUser()]
+
+
+def get_permission_local(record=None):
+    return TUGRAZPermissionPolicy(record=record, action="read")

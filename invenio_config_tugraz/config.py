@@ -9,6 +9,7 @@
 """invenio module that adds tugraz configs."""
 
 from flask_babelex import gettext as _
+from invenio_rdm_records.config import RECORDS_UI_ENDPOINTS
 
 INVENIO_CONFIG_TUGRAZ_SHIBBOLETH = True
 """Set True if SAML is configured"""
@@ -187,8 +188,13 @@ RECAPTCHA_PRIVATE_KEY = None
 # See:
 # https://invenio-records-permissions.readthedocs.io/en/latest/configuration.html
 #
-# Uncomment these to enable overriden
-# RECORDS_PERMISSIONS_RECORD_POLICY = (
-#    'invenio_config_tugraz.permissions.TUGRAZPermissionPolicy'
-# )
+
+RECORDS_PERMISSIONS_RECORD_POLICY = (
+    "invenio_config_tugraz.permissions.TUGRAZPermissionPolicy"
+)
 """Access control configuration for records."""
+
+
+RECORDS_UI_ENDPOINTS["recid"].update(
+    permission_factory_imp="invenio_config_tugraz.permissions:get_permission_local"
+)

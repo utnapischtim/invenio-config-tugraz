@@ -153,14 +153,26 @@ The succinct encoding of the permissions for your instance gives you
 
 from elasticsearch_dsl.query import Q
 from flask import current_app, request
+from flask_principal import identity_loaded
+from invenio_access.permissions import SystemRoleNeed, any_user
 from invenio_records_permissions.generators import Generator
+
+single_ip = SystemRoleNeed("single_ip")
+
+
+@identity_loaded.connect
+def on_identity_loaded(sender, identity):
+    """Store groups in session whenever identity is loaded."""
+    user_ip = request.remote_addr
+    if user_ip in current_app.config.get("INVENIO_CONFIG_TUGRAZ_SINGLE_IP"):
+        identity.provides.add(single_ip)
 
 
 class RecordIp(Generator):
     """Allowed any user with accessing with the IP."""
 
     # TODO: Implement
-    def needs(self, **kwargs):
+    def needs(self, record=None, **kwargs):
         """Enabling Needs, Set of Needs granting permission.
 
         If ANY of the Needs are matched, permission is granted.
@@ -174,7 +186,8 @@ class RecordIp(Generator):
             It also expands ActionNeeds into the Users/Roles that
             provide them.
         """
-        return []
+        is_single_ip = record.get("access", {}).get("access_right") == "single_ip"
+        return [single_ip] if is_single_ip else []
 
     def excludes(self, **kwargs):
         """Preventing Needs, Set of Needs denying permission.
@@ -202,7 +215,13 @@ class RecordIp(Generator):
         These filters consist of additive queries mapping to what the current
         user should be able to retrieve via search.
         """
-        return Q('match_all')
+        identity = kwargs.get("identity", {"provides": []})
+
+        for need in identity.provides:
+            if need.value == "single_ip":
+                return Q("match", **{"access.access_right": "single_ip"})
+
+        return []
 
     def check_permission(self):
         """Check for User IP address in config variable."""
@@ -212,3 +231,23 @@ class RecordIp(Generator):
         if user_ip in current_app.config["INVENIO_CONFIG_TUGRAZ_SINGLE_IP"]:
             return True  # pragma: no cover
         return False  # pragma: no cover
+
+
+class AnyUserIfPublic(Generator):
+    """Allows any user if record is public.
+
+    TODO: Revisit when dealing with files.
+    """
+
+    def needs(self, record=None, **kwargs):
+        """Enabling Needs."""
+        is_open = record and record.get("access", {}).get("access_right", "") == "open"
+        return [any_user] if is_open else []
+
+    def excludes(self, record=None, **kwargs):
+        """Preventing Needs."""
+        return []
+
+    def query_filter(self, **kwargs):
+        """Filters for non-restricted records."""
+        return Q("match", **{"access.access_right": "open"})
