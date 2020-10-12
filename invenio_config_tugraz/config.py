@@ -10,6 +10,9 @@
 
 from flask_babelex import gettext as _
 from invenio_rdm_records.config import RECORDS_UI_ENDPOINTS
+from invenio_rdm_records.permissions import RDMRecordPermissionPolicy
+
+from .permissions import TUGRAZPermissionPolicy
 
 INVENIO_CONFIG_TUGRAZ_SHIBBOLETH = True
 """Set True if SAML is configured"""
@@ -199,3 +202,28 @@ RECORDS_UI_ENDPOINTS["recid"].update(
     permission_factory_imp="invenio_config_tugraz.permissions:get_permission_local"
 )
 """Override the permission for the record landing page."""
+
+
+RDMRecordPermissionPolicy.can_search = TUGRAZPermissionPolicy.can_search
+"""Override the RDMRecordPermissionPolicy search permissions"""
+
+RDMRecordPermissionPolicy.can_read = TUGRAZPermissionPolicy.can_read
+"""Override the RDMRecordPermissionPolicy read permissions"""
+
+RDMRecordPermissionPolicy.can_create = TUGRAZPermissionPolicy.can_create
+"""Override the RDMRecordPermissionPolicy create permissions"""
+
+RDMRecordPermissionPolicy.can_update = TUGRAZPermissionPolicy.can_update
+"""Override the RDMRecordPermissionPolicy update permissions"""
+
+RDMRecordPermissionPolicy.can_delete = TUGRAZPermissionPolicy.can_delete
+"""Override the RDMRecordPermissionPolicy delete permissions"""
+
+RDMRecordPermissionPolicy.can_read_files = TUGRAZPermissionPolicy.can_read_files
+"""Override the RDMRecordPermissionPolicy read files permissions"""
+
+RDMRecordPermissionPolicy.can_update_files = TUGRAZPermissionPolicy.can_update_files
+"""Override the RDMRecordPermissionPolicy update files permissions"""
+
+RDMRecordPermissionPolicy.can_publish = TUGRAZPermissionPolicy.can_publish
+"""Override the RDMRecordPermissionPolicy publish permissions"""
