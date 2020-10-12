@@ -88,4 +88,5 @@ class TUGRAZPermissionPolicy(BasePermissionPolicy):
 
 
 def get_permission_local(record=None):
-    return TUGRAZPermissionPolicy(record=record, action="read")
+    """Return the TUGRAZPermissionPolicy."""
+    return TUGRAZPermissionPolicy(record=record, action="read")  # pragma: no cover
