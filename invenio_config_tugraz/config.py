@@ -198,3 +198,4 @@ RECORDS_PERMISSIONS_RECORD_POLICY = (
 RECORDS_UI_ENDPOINTS["recid"].update(
     permission_factory_imp="invenio_config_tugraz.permissions:get_permission_local"
 )
+"""Override the permission for the record landing page."""
