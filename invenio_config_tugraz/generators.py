@@ -186,6 +186,9 @@ class RecordIp(Generator):
             It also expands ActionNeeds into the Users/Roles that
             provide them.
         """
+        if record is None:
+            return []
+
         is_single_ip = record.get("access", {}).get("access_right") == "single_ip"
         return [single_ip] if is_single_ip else []
 
@@ -215,7 +218,10 @@ class RecordIp(Generator):
         These filters consist of additive queries mapping to what the current
         user should be able to retrieve via search.
         """
-        identity = kwargs.get("identity", {"provides": []})
+        identity = kwargs.get("identity")
+
+        if identity is None:
+            return []
 
         for need in identity.provides:
             if need.value == "single_ip":
@@ -241,7 +247,10 @@ class AnyUserIfPublic(Generator):
 
     def needs(self, record=None, **kwargs):
         """Enabling Needs."""
-        is_open = record and record.get("access", {}).get("access_right", "") == "open"
+        if record is None:
+            return []
+
+        is_open = record.get("access", {}).get("access_right", "") == "open"
         return [any_user] if is_open else []
 
     def excludes(self, record=None, **kwargs):
