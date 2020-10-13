@@ -50,10 +50,10 @@ Permissions for Invenio (RDM) Records.
 """
 
 
-from invenio_records_permissions.generators import Admin, AnyUser, RecordOwners
+from invenio_records_permissions.generators import Admin, AnyUser
 from invenio_records_permissions.policies.base import BasePermissionPolicy
 
-from .generators import AnyUserIfPublic, RecordIp
+from .generators import AnyUserIfPublic, RecordIp, RecordOwners
 
 
 # bug this policy is not used!

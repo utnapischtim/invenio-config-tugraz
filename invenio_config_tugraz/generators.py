@@ -153,7 +153,7 @@ The succinct encoding of the permissions for your instance gives you
 
 from elasticsearch_dsl.query import Q
 from flask import current_app, request
-from flask_principal import identity_loaded
+from flask_principal import UserNeed, identity_loaded
 from invenio_access.permissions import SystemRoleNeed, any_user
 from invenio_records_permissions.generators import Generator
 
@@ -260,3 +260,21 @@ class AnyUserIfPublic(Generator):
     def query_filter(self, **kwargs):
         """Filters for non-restricted records."""
         return Q("match", **{"access.access_right": "open"})
+
+
+class RecordOwners(Generator):
+    """Allows record owners."""
+
+    def needs(self, record=None, **kwargs):
+        """Enabling Needs."""
+        if record is None:
+            return []
+
+        return [UserNeed(owner) for owner in record.get("owners", [])]
+
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as owner."""
+        for need in identity.provides:
+            if need.method == "id":
+                return Q("term", owners=need.value)
+        return []
