@@ -187,17 +187,6 @@ RECAPTCHA_PUBLIC_KEY = None
 RECAPTCHA_PRIVATE_KEY = None
 
 # invenio-records-permissions
-# =======
-# See:
-# https://invenio-records-permissions.readthedocs.io/en/latest/configuration.html
-#
-
-RECORDS_PERMISSIONS_RECORD_POLICY = (
-    "invenio_config_tugraz.permissions.TUGRAZPermissionPolicy"
-)
-"""Access control configuration for records."""
-
-
 RECORDS_UI_ENDPOINTS["recid"].update(
     permission_factory_imp="invenio_config_tugraz.permissions:get_permission_local"
 )
