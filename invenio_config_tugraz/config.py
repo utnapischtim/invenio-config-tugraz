@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2023 Graz University of Technology.
+# Copyright (C) 2020-2024 Graz University of Technology.
 #
 # invenio-config-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -372,3 +372,12 @@ OAISERVER_ADMIN_EMAILS = [
 
 It **must** include one or more instances.
 """
+
+# concept dois for documentation
+# ========
+
+GUIDE_DE_CONCEPT_DOI = ""
+"""German guide."""
+
+GUIDE_EN_CONCEPT_DOI = ""
+"""English guide."""

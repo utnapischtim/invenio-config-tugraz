@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020-2022 Graz University of Technology.
+# Copyright (C) 2020-2024 Graz University of Technology.
 #
 # invenio-config-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,7 +8,7 @@
 
 """invenio module for TUGRAZ config."""
 
-from flask import Blueprint, redirect, url_for
+from flask import Blueprint, current_app, redirect, url_for
 from invenio_i18n import get_locale
 
 
@@ -33,13 +33,16 @@ def ui_blueprint(app):
 def guide():
     """TUGraz_Repository_Guide."""
     locale = get_locale()
-    return redirect(
-        url_for(
-            "static",
-            filename=f"documents/TUGraz_Repository_Guide_02.1_{locale}.pdf",
-            _external=True,
-        )
-    )
+
+    match locale:
+        case "de":
+            concept_doi = current_app.config.get("GUIDE_DE_CONCEPT_DOI")
+        case "en":
+            concept_doi = current_app.config.get("GUIDE_EN_CONCEPT_DOI")
+        case _:
+            concept_doi = current_app.config.get("GUIDE_EN_CONCEPT_DOI")
+
+    return redirect(url_for(f"doi/{concept_doi}"))
 
 
 def terms():
