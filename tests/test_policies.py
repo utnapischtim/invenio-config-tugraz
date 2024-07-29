@@ -8,6 +8,14 @@
 
 """Tests for permissions-policy."""
 
+from flask_principal import RoleNeed, UserNeed
+from invenio_access.permissions import (
+    any_user,
+    authenticated_user,
+    system_identity,
+    system_process,
+)
+from invenio_rdm_records.records import RDMParent, RDMRecord
 from invenio_rdm_records.services.permissions import RDMRecordPermissionPolicy
 
 from invenio_config_tugraz.permissions.policies import TUGrazRDMRecordPermissionPolicy
@@ -86,3 +94,29 @@ def test_policies_synced() -> None:
             otherwise fix TUGrazRDMRecordPermissionPolicy.NEED_LABEL_TO_ACTION
             """
             raise ValueError(msg)
+
+
+def test_policies_allowed_differences(anyuser_identity, authenticated_identity):
+    """Test the differences."""
+    policy = TUGrazRDMRecordPermissionPolicy
+
+    # todo add to fixture
+    rest_record = RDMRecord.create({}, access={}, parent=RDMParent.create({}))
+    rest_record.access.protection.set("restricted", "restricted")
+    rest_record.parent.access.owner = {"user": 1}
+
+    # todo add to fixture
+    pub_record = RDMRecord.create({}, access={}, parent=RDMParent.create({}))
+    pub_record.access.protection.set("public", "public")
+    pub_record.parent.access.owner = {"user": 21}
+
+    assert policy(action="view").allows(anyuser_identity)
+    assert policy(action="view").allows(system_identity)
+    assert policy(action="search").allows(anyuser_identity)
+    assert policy(action="search").allows(system_identity)
+    assert policy(action="create").allows(authenticated_identity)
+    assert policy(action="create").allows(system_identity)
+
+    assert policy(action="view").generators[0].needs(record=rest_record) == {
+        UserNeed(1)
+    }

@@ -16,6 +16,8 @@ fixtures are available.
 
 import pytest
 from flask import Flask
+from flask_principal import Identity, UserNeed
+from invenio_access.permissions import any_user, authenticated_user
 
 from invenio_config_tugraz import InvenioConfigTugraz
 
@@ -31,3 +33,20 @@ def create_app(instance_path: str) -> Flask:
         return app
 
     return factory
+
+
+@pytest.fixture(scope="function")
+def anyuser_identity():
+    """System identity."""
+    identity = Identity(1)
+    identity.provides.add(any_user)
+    return identity
+
+
+@pytest.fixture(scope="function")
+def authenticated_identity():
+    """Authenticated identity fixture."""
+    identity = Identity(100)
+    identity.provides.add(UserNeed(100))
+    identity.provides.add(authenticated_user)
+    return identity
